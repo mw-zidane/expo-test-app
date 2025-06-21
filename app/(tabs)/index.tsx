@@ -1,75 +1,173 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Appearance,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function HomeScreen() {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    age: '',
+    placeOfBirth: '',
+    schoolName: '',
+  });
+
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    Appearance.getColorScheme() || 'light'
+  );
+  const isDark = theme === 'dark';
+
+  const handleChange = (key: keyof typeof form, value: string) => {
+    setForm({ ...form, [key]: value });
+  };
+
+  const handleSubmit = () => {
+    const { name, email, password, age, placeOfBirth, schoolName } = form;
+    if (!name || !email || !password || !age || !placeOfBirth || !schoolName) {
+      Alert.alert('Validation Error', 'Please fill in all fields');
+      return;
+    }
+
+    Alert.alert(
+      'Form Submitted',
+      `Name: ${name}\nEmail: ${email}\nPassword: ${password}\nAge: ${age}\nPlace of Birth: ${placeOfBirth}\nSchool Name: ${schoolName}`
+    );
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={[styles.container, isDark && styles.containerDark]}>
+      <Text style={[styles.title, isDark && styles.titleDark]}>React Native Form</Text>
+
+      <TouchableOpacity style={styles.toggleButton} onPress={toggleTheme}>
+        <Text style={styles.toggleButtonText}>
+          Switch to {isDark ? 'Light' : 'Dark'} Theme
+        </Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your name"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        value={form.name}
+        onChangeText={(text) => handleChange('name', text)}
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your email"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        keyboardType="email-address"
+        value={form.email}
+        onChangeText={(text) => handleChange('email', text)}
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your password"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        secureTextEntry
+        value={form.password}
+        onChangeText={(text) => handleChange('password', text)}
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your age"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        keyboardType="numeric"
+        value={form.age}
+        onChangeText={(text) => handleChange('age', text)}
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your place of birth"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        value={form.placeOfBirth}
+        onChangeText={(text) => handleChange('placeOfBirth', text)}
+      />
+      <TextInput
+        style={[styles.input, isDark && styles.inputDark]}
+        placeholder="Enter your school's name"
+        placeholderTextColor={isDark ? '#ccc' : '#666'}
+        value={form.schoolName}
+        onChangeText={(text) => handleChange('schoolName', text)}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  containerDark: {
+    backgroundColor: '#1f2937',
+  },
+  title: {
+    fontSize: 26,
+    marginBottom: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#1f2937',
+  },
+  titleDark: {
+    color: '#f9fafb',
+  },
+  input: {
+    height: 48,
+    borderColor: '#999',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    backgroundColor: '#fff',
+    color: '#111827',
+    fontSize: 16,
+  },
+  inputDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4b5563',
+    color: '#f9fafb',
+  },
+  button: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 14,
+    borderRadius: 8,
     alignItems: 'center',
-    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+    marginTop: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  toggleButton: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  toggleButtonText: {
+    color: '#3b82f6',
+    fontWeight: '600',
+    fontSize: 15,
   },
 });
