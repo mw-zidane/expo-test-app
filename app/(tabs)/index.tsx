@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-export default function HomeScreen() {
+const HomeScreen = () => {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -28,17 +28,43 @@ export default function HomeScreen() {
     setForm({ ...form, [key]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { name, email, password, age, placeOfBirth, schoolName } = form;
     if (!name || !email || !password || !age || !placeOfBirth || !schoolName) {
       Alert.alert('Validation Error', 'Please fill in all fields');
       return;
     }
 
-    Alert.alert(
-      'Form Submitted',
-      `Name: ${name}\nEmail: ${email}\nPassword: ${password}\nAge: ${age}\nPlace of Birth: ${placeOfBirth}\nSchool Name: ${schoolName}`
-    );
+    try {
+      const response = await fetch('http://192.168.137.251:3001/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', data.message || 'Form submitted successfully');
+        setForm({
+          name: '',
+          email: '',
+          password: '',
+          age: '',
+          placeOfBirth: '',
+          schoolName: '',
+        });
+      } else {
+        Alert.alert('Error', data.message || 'Failed to submit form');
+      }
+      console.log('Form submitted:', form);
+      console.log('Response:', data);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      Alert.alert('Error', 'An unexpected error occurred');
+    }
   };
 
   const toggleTheme = () => {
@@ -106,7 +132,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -171,3 +197,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+export default HomeScreen;
